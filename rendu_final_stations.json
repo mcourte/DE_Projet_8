@@ -1,0 +1,42 @@
+[
+    {
+        "Weather Station ID": "00052",
+        "Station Name": "Armentières",
+        "Latitude / Longitude": "50.689° N, 2.877° E",
+        "Elevation": "23",
+        "City": "Armentières",
+        "State": "-/-",
+        "Hardware": "other",
+        "Software": "EasyWeatherPro_V5.1.6"
+    },
+    {
+        "Weather Station ID": "000R5",
+        "Station Name": "Bergues",
+        "Latitude / Longitude": "50.968° N, 2.441° E",
+        "Elevation": "23",
+        "City": "Bergues",
+        "State": "-/-",
+        "Hardware": "other",
+        "Software": "EasyWeatherPro_V5.1.6"
+    },
+    {
+        "Weather Station ID": "07015",
+        "Station Name": "Lille-Lesquin",
+        "Latitude / Longitude": "50.575° N, 3.092° E",
+        "Elevation": "23",
+        "City": "Lille-Lesquin",
+        "State": "-/-",
+        "Hardware": "other",
+        "Software": "EasyWeatherPro_V5.1.6"
+    },
+    {
+        "Weather Station ID": "STATIC0010",
+        "Station Name": "Hazebrouck",
+        "Latitude / Longitude": "50.734° N, 2.545° E",
+        "Elevation": "23",
+        "City": "Hazebrouck",
+        "State": "-/-",
+        "Hardware": "other",
+        "Software": "EasyWeatherPro_V5.1.6"
+    }
+]
