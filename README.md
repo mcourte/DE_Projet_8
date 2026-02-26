@@ -73,15 +73,15 @@ python3 transform_and_load.py
 python3 audit_integrity.py
 python3 temp_access.py
 ```
-
+  
 ## 🛠️ Logigramme du Processus
-**Début**: Lancement du script Python.
-**Entrée** : Récupération du CSV sur AWS S3 via ```boto3```.
-**Traitement** : Extraction JSON et nettoyage via ```pandas```.
-**Décision** : Test d'intégrité (Doublons/Nulls).
-**Stockage** : ```insert_many``` vers MongoDB (Replica Set).
-**Fin** : Génération du JSON de rendu.
-
+**Début**: Lancement du script Python.  
+**Entrée** : Récupération du CSV sur AWS S3 via ```boto3```.  
+**Traitement** : Extraction JSON et nettoyage via ```pandas```.  
+**Décision** : Test d'intégrité (Doublons/Nulls).  
+**Stockage** : ```insert_many``` vers MongoDB (Replica Set).  
+**Fin** : Génération du JSON de rendu.  
+  
 ## 📝 Rapport Final : rendu_final_stations.json
 
 Exemple du contenu attendu après exécution de ton script d'export.
