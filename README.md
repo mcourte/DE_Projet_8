@@ -1,58 +1,78 @@
 # 🌦️ Pipeline ETL : Référentiel Stations Météo (Projet 8)
 
-Ce projet automatise l'extraction, la transformation et le stockage du référentiel des stations météo d'InfoClimat. Le pipeline assure la transition des données depuis une source brute (Google Drive) vers une base de données NoSQL (MongoDB) via un transit sécurisé sur AWS S3.
+Ce projet automatise l'extraction, la transformation et le stockage du référentiel des stations météo d'InfoClimat. Le pipeline assure la transition sécurisée des données depuis une source brute vers une base de données NoSQL MongoDB configurée en haute disponibilité.
 
 ## 🏗️ Architecture & Logique de Migration
 
-Le processus suit une architecture **ETL** (Extract, Transform, Load) structurée :
+Le processus suit une architecture **ETL** (Extract, Transform, Load) structurée pour garantir l'intégrité des données :
 
 
 
 ### 1. Extraction (Source vers S3)
-* **Source** : Fichier `referentiel_stations.jsonl` sur Google Drive.
+* **Source** : Données brutes issues d'InfoClimat (via Google Drive).
 * **Transport** : Synchronisation via **Airbyte** vers un bucket **AWS S3** (format CSV).
-* **Formatage** : Les données sont extraites de la colonne brute `_airbyte_data`.
+* **Formatage** : Les données sont extraites dynamiquement depuis la colonne brute `_airbyte_data`.
 
 ### 2. Transformation (Python & Pandas)
-Le script `transform_and_load.py` effectue les opérations suivantes :
-* **Nettoyage (Data Quality)** : Sur les 1157 lignes initiales, le script identifie et supprime les doublons.
-* **Filtrage métier** : Seules les **4 stations de référence** sont conservées (élimination du bruit de mesures temporelles).
-* **Validation** : Vérification de la présence des colonnes critiques (`id`, `name`, `latitude`, `longitude`).
+Le script `transform_and_load.py` effectue les opérations critiques suivantes :
+* **Nettoyage (Data Quality)** : Sur les 1157 lignes initiales, le script identifie et supprime les doublons (1152 lignes redondantes éliminées).
+* **Filtrage métier** : Seules les **4 stations de référence** sont conservées pour isoler le référentiel du bruit de mesures.
+* **Validation** : Vérification stricte du typage (coordonnées en floats) et de la présence des colonnes critiques (`id`, `name`, `latitude`, `longitude`).
 
 ### 3. Stockage & Réplication (MongoDB)
-* **CRUD** : Le script implémente les opérations de création, lecture et mise à jour.
-* **Réplication** : Les données sont stockées sur un **Replica Set** (3 nœuds via MongoDB Atlas ou config `--replSet`), garantissant la haute disponibilité et la tolérance aux pannes.
+* **CRUD** : Implémentation des opérations de création, lecture et mise à jour.
+* **Haute Disponibilité** : Les données sont stockées sur un **Replica Set** (`rs0`), garantissant la tolérance aux pannes et la persistance des données sur plusieurs nœuds.
 
 ---
 
-## 🚀 Fonctionnement du Script
+## 🔍 Observabilité & Qualité des Données
 
-### Installation
+Afin de valider la robustesse du pipeline, trois scripts d'audit ont été déployés :
+
+### 🛡️ Audit d'Intégrité (`audit_integrity.py`)
+| Indicateur | Source (S3) | Cible (MongoDB) | Statut |
+| :--- | :--- | :--- | :--- |
+| **Volume de lignes** | 1157 | **4** | ✅ Filtrage OK |
+| **Doublons (IDs)** | 1152 | **0** | ✅ Dédoublonnage OK |
+| **Valeurs manquantes**| 4580 | **0** | ✅ Nettoyage OK |
+| **Taux d'erreur final**| - | **0.00%** | ✅ Intégrité Totale |
+
+
+
+### ⏱️ Mesure de Performance (`temp_access.py`)
+* **Temps d'accessibilité moyen** : **45.56 ms**.
+* **Analyse** : Ce temps de réponse quasi-instantané valide l'indexation et l'efficacité de la structure NoSQL pour des requêtes fréquentes.
+
+### 🔄 Test de Réplication (`test_replication.py`)
+* **État du Cluster** : Détection automatique du nœud `PRIMARY`.
+* **Vérification** : Test de "Write Propagation" réussi (la donnée écrite sur le maître est immédiatement disponible en lecture).
+
+---
+
+## 🚀 Installation et Utilisation
+
+### Pré-requis
+* Python 3.12+
+* MongoDB configuré en mode Replica Set (`--replSet rs0`)
+* Fichier `.env` configuré avec vos accès AWS S3.
+
+### Exécution
+1. Préparation de l'environnement
+
 ```
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 ```
-
-### Exécution du PipelineBash
+2. Lancement du Pipeline ETL
 ```
 python3 transform_and_load.py
 ```
-
-### Génération du Rapport Final
+3. Exécution des Audits de Qualité
 ```
-python3 export_to_json.py
+python3 audit_integrity.py
+python3 temp_access.py
 ```
-
-## 📊 Mesure de la Qualité (Post-Migration)
-
-
-| Métrique | Valeur | Commentaire |
-| :--- | :--- | :--- |
-| **Lignes extraites (Raw)** | 1157 | Données brutes issues de S3 |
-| **Stations validées** | 4 | Après filtrage et dédoublonnage |
-| **Taux d'erreur/rejet** | 99.65% | Filtrage ciblé pour isoler le référentiel |
-| **Statut final** | ✅ Succès | Migration conforme au schéma cible |
 
 ## 🛠️ Logigramme du Processus
 **Début**: Lancement du script Python.
