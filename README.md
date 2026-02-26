@@ -100,3 +100,26 @@ Exemple du contenu attendu après exécution de ton script d'export.
     }
 ]
 ```
+
+
+## 🐳 Déploiement avec Docker  
+  
+Le projet est entièrement conteneurisé pour garantir la portabilité.  
+  
+### Lancement complet (ETL + MongoDB)
+```
+docker-compose up --build
+```
+Vérification de la persistance  
+  
+Le volume mongo_data assure que les données persistent après un docker-compose down.  
+
+Le script d'audit audit_integrity.py s'exécute automatiquement après la migration pour valider le succès dans le conteneur.  
+
+---
+
+### 🚀 Commande pour tester tout de suite :
+
+```
+docker-compose up --build
+```
